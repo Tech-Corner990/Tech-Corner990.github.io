@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NbeeL</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+
+:root{
+  --primary:#22d3ee;
+  --accent:#3b82f6;
+  --bg:#0b1220;
+  --card:#1e293b;
+  --text:#e2e8f0;
+  --muted:#94a3b8;
+  --border:#334155;
+  --radius:16px;
+  --shadow:0 6px 20px rgba(0,0,0,.15);
+  --glow:0 0 20px rgba(34,211,238,.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal','Segoe UI',Tahoma,Arial,sans-serif;}
+body{background:var(--bg);color:var(--text);line-height:1.8;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+
+/* ====== الهيدر المحسّن ====== */
+header{
+  background:linear-gradient(135deg,var(--accent),var(--primary));
+  color:#fff;padding:80px 20px 100px;text-align:center;
+  border-radius:0 0 50px 50px;
+  position:relative;
+  overflow:hidden;
+}
+header::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle,rgba(255,255,255,.1) 1px,transparent 1px);
+  background-size:30px 30px;animation:float 20s linear infinite;
+}
+@keyframes float{
+  0%{transform:translate(0,0)}
+  100%{transform:translate(30px,30px)}
+}
+header .glow-circle{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:.4;
+  animation:pulse 4s ease-in-out infinite;
+}
+.glow-circle.g1{width:300px;height:300px;background:#22d3ee;top:-100px;right:-50px;}
+.glow-circle.g2{width:250px;height:250px;background:#3b82f6;bottom:-80px;left:-30px;animation-delay:2s;}
+@keyframes pulse{
+  0%,100%{transform:scale(1);opacity:.4}
+  50%{transform:scale(1.2);opacity:.6}
+}
+header .avatar{
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,.95);color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:48px;font-weight:900;margin:0 auto 20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.3),0 0 0 4px rgba(255,255,255,.2);
+  position:relative;z-index:2;
+  animation:avatarFloat 3s ease-in-out infinite;
+  border:4px solid rgba(255,255,255,.3);
+}
+@keyframes avatarFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+header h1{
+  font-size:2.5rem;margin-bottom:10px;font-weight:900;
+  position:relative;z-index:2;
+  text-shadow:0 2px 10px rgba(0,0,0,.2);
+}
+header .tagline{
+  opacity:.95;font-size:1.15rem;position:relative;z-index:2;
+  min-height:1.8em;
+}
+.tagline .typed{
+  display:inline-block;
+}
+.tagline .cursor{
+  display:inline-block;width:3px;height:1.2em;background:#fff;
+  margin-right:2px;animation:blink .7s infinite;vertical-align:middle;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.socials{margin-top:20px;position:relative;z-index:2;}
+.socials a{
+  display:inline-block;margin:0 8px;padding:10px 22px;
+  background:rgba(255,255,255,.2);border-radius:30px;transition:.3s;
+  backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);
+  font-weight:500;
+}
+.socials a:hover{
+  background:rgba(255,255,255,.35);transform:translateY(-3px);
+  box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+/* ====== زر القائمة ====== */
+.menu-btn{
+  position:fixed;top:14px;right:14px;z-index:300;width:52px;height:52px;
+  border-radius:16px;border:none;background:rgba(15,23,42,.7);color:#fff;
+  font-size:26px;cursor:pointer;backdrop-filter:blur(10px);
+  box-shadow:0 4px 14px rgba(0,0,0,.25);transition:.25s;
+}
+.menu-btn:hover{background:rgba(15,23,42,.9);transform:scale(1.05);}
+#overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:240;
+  opacity:0;pointer-events:none;transition:.3s;backdrop-filter:blur(3px);
+}
+#overlay.show{opacity:1;pointer-events:auto;}
+#menuPanel{
+  position:fixed;top:0;right:-280px;width:260px;height:100vh;z-index:250;
+  background:var(--card);box-shadow:-6px 0 24px rgba(0,0,0,.25);
+  padding:80px 16px 16px;transition:right .3s ease;
+  display:flex;flex-direction:column;gap:10px;
+}
+#menuPanel.open{right:0;}
+#menuPanel button{
+  text-align:right;border:none;background:none;padding:16px 18px;
+  border-radius:14px;font-size:1.1rem;cursor:pointer;color:var(--text);transition:.25s;
+  display:flex;align-items:center;gap:12px;
+}
+#menuPanel button.active,#menuPanel button:hover{
+  background:var(--primary);color:#fff;transform:translateX(-5px);
+  box-shadow:0 4px 12px rgba(34,211,238,.3);
+}
+
+/* ====== المحتوى الرئيسي ====== */
+main{max-width:1000px;margin:-50px auto 60px;padding:0 16px;position:relative;z-index:5;}
+section{display:none;animation:fadeUp .5s ease;}
+section.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+.section-title{
+  font-size:1.6rem;margin:30px 0 20px;display:flex;align-items:center;gap:12px;
+  font-weight:800;
+}
+.section-title::after{
+  content:'';flex:1;height:4px;background:linear-gradient(90deg,var(--primary),transparent);
+  border-radius:4px;
+}
+.section-title .icon{
+  font-size:1.8rem;
+}
+
+/* ====== الإحصائيات ====== */
+.stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:16px;margin-bottom:30px;
+}
+.stat-card{
+  background:var(--card);border-radius:var(--radius);padding:24px 16px;
+  text-align:center;box-shadow:var(--shadow);
+  border:1px solid var(--border);position:relative;overflow:hidden;
+  transition:.3s;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+}
+.stat-card:hover{transform:translateY(-5px);box-shadow:var(--glow);}
+.stat-card .num{
+  font-size:2.2rem;font-weight:900;color:var(--primary);
+  display:block;margin-bottom:5px;
+}
+.stat-card .label{color:var(--muted);font-size:.95rem;}
+
+/* ====== البطاقات ====== */
+.card{
+  background:var(--card);border-radius:var(--radius);padding:24px;margin-bottom:20px;
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  transition:.3s;position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;right:0;width:4px;height:100%;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--glow);}
+
+/* ====== بطاقات البرامج ====== */
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+.prog-card{
+  background:var(--card);border-radius:var(--radius);padding:24px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;
+  border:1px solid var(--border);position:relative;overflow:hidden;
+  transition:.35s;
+}
+.prog-card::after{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle,rgba(34,211,238,.08) 1px,transparent 1px);
+  background-size:20px 20px;opacity:0;transition:.3s;
+}
+.prog-card:hover{transform:translateY(-8px);box-shadow:var(--glow);border-color:var(--primary);}
+.prog-card:hover::after{opacity:1;}
+.prog-card .icon{
+  font-size:40px;width:70px;height:70px;background:rgba(34,211,238,.1);
+  border-radius:18px;display:flex;align-items:center;justify-content:center;
+  transition:.3s;
+}
+.prog-card:hover .icon{
+  transform:scale(1.1) rotate(-5deg);
+  background:rgba(34,211,238,.2);
+}
+.prog-card h3{font-size:1.2rem;font-weight:700;}
+.prog-card p{color:var(--muted);font-size:.95rem;flex:1;}
+.prog-card .tags{display:flex;flex-wrap:wrap;gap:6px;}
+.prog-card .tags span{
+  background:rgba(34,211,238,.12);color:var(--primary);padding:4px 14px;
+  border-radius:20px;font-size:.8rem;font-weight:500;
+  border:1px solid rgba(34,211,238,.2);
+}
+.prog-card .btn{
+  display:inline-block;text-align:center;margin-top:8px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;padding:12px;border-radius:12px;transition:.25s;
+  font-weight:700;position:relative;z-index:2;
+}
+.prog-card .btn:hover{
+  filter:brightness(1.2);transform:scale(1.02);
+  box-shadow:0 5px 15px rgba(34,211,238,.3);
+}
+
+/* ====== المقالات ====== */
+.post-meta{
+  color:var(--muted);font-size:.85rem;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.post-meta::before{
+  content:'📅';
+}
+
+/* ====== زر العودة للأعلى ====== */
+#toTop{
+  position:fixed;bottom:25px;left:25px;width:50px;height:50px;
+  border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;border:none;font-size:22px;cursor:pointer;
+  box-shadow:0 4px 15px rgba(34,211,238,.4);
+  opacity:0;pointer-events:none;transition:.3s;z-index:200;
+}
+#toTop.show{opacity:1;pointer-events:auto;}
+#toTop:hover{transform:translateY(-5px);}
+
+/* ====== تأثيرات الظهور ====== */
+.reveal{
+  opacity:0;transform:translateY(30px);
+  transition:all .6s ease;
+}
+.reveal.visible{
+  opacity:1;transform:translateY(0);
+}
+
+/* ====== الفوتر ====== */
+footer{
+  text-align:center;padding:30px;color:var(--muted);font-size:.9rem;
+  border-top:1px solid var(--border);margin-top:40px;
+}
+
+/* ====== الوضع الفاتح ====== */
+body.light{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#1e293b;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --shadow:0 4px 15px rgba(0,0,0,.08);
+}
+body.light .prog-card::after,
+body.light header::before{
+  display:none;
+}
+
+/* ====== التجاوب ====== */
+@media(max-width:600px){
+  header h1{font-size:1.8rem;}
+  header .avatar{width:90px;height:90px;font-size:36px;}
+  .prog-grid{grid-template-columns:1fr;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="glow-circle g1"></div>
+  <div class="glow-circle g2"></div>
+  <div class="avatar" id="avatar">N</div>
+  <h1 id="ownerName">NbeeL</h1>
+  <div class="tagline">
+    <span class="typed" id="typedTagline"></span>
+    <span class="cursor"></span>
+  </div>
+  <div class="socials" id="socials"></div>
+</header>
+
+<button class="menu-btn" onclick="toggleMenu()" aria-label="القائمة">☰</button>
+<div id="overlay" onclick="toggleMenu()"></div>
+<div id="menuPanel">
+  <button class="active" onclick="showSection('home',this)">🏠 الرئيسية</button>
+  <button onclick="showSection('programs',this)">💻 برامجي</button>
+  <button onclick="showSection('blog',this)">📝 المدونة</button>
+  <button onclick="showSection('about',this)">👤 من أنا</button>
+</div>
+
+<main>
+  <section id="home" class="show">
+    <!-- الإحصائيات -->
+    <div class="stats reveal">
+      <div class="stat-card">
+        <span class="num" id="statPrograms">0</span>
+        <span class="label">برنامج</span>
+      </div>
+      <div class="stat-card">
+        <span class="num" id="statPosts">0</span>
+        <span class="label">مقال</span>
+      </div>
+      <div class="stat-card">
+        <span class="num" id="statTags">0</span>
+        <span class="label">تقنية</span>
+      </div>
+      <div class="stat-card">
+        <span class="num">∞</span>
+        <span class="label">شغف</span>
+      </div>
+    </div>
+
+    <h2 class="section-title"><span class="icon">💻</span> آخر البرامج</h2>
+    <div class="prog-grid reveal" id="homePrograms"></div>
+
+    <h2 class="section-title"><span class="icon">📝</span> آخر المقالات</h2>
+    <div class="reveal" id="homePosts"></div>
+  </section>
+
+  <section id="programs">
+    <h2 class="section-title"><span class="icon">💻</span> جميع برامجي</h2>
+    <div class="prog-grid" id="allPrograms"></div>
+  </section>
+
+  <section id="blog">
+    <h2 class="section-title"><span class="icon">📝</span> مقالات المدونة</h2>
+    <div id="allPosts"></div>
+  </section>
+
+  <section id="about">
+    <h2 class="section-title"><span class="icon">👤</span> من أنا</h2>
+    <div class="card">
+      <p style="font-size:1.1rem;line-height:2" id="aboutText"></p>
+    </div>
+  </section>
+</main>
+
+<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="العودة للأعلى">↑</button>
+
+<footer id="footerText">جميع الحقوق محفوظة © 2026 — NbeeL</footer>
+
+<script src="data.js"></script>
+<script>
+const fallbackData = {
+  siteTitle:'NbeeL',
+  ownerName:'NbeeL',
+  tagline:'مبرمج مبتدئ شغوف بالتقنية',
+  aboutText:'مرحباً! أنا نبيل، مبرمج شغوف بالتقنية والبرمجة. أحب أتعلم أشياء جديدة وأشاركها مع العالم. هنا تجد برامجي ومشاريعي وأفكاري.',
+  socials:['https://www.instagram.com','','',''],
+  footerText:'جميع الحقوق محفوظة © 2026 — NbeeL',
+  themeMode:'dark',
+  colorPrimary:'#22d3ee',
+  colorAccent:'#3b82f6',
+  colorBg:'#0b1220',
+  colorCard:'#1e293b',
+  colorText:'#e2e8f0',
+  programs:[
+    {name:'برنامجي الأول', desc:'غيّر هذا الوصف من لوحة التحكم', link:'#', tags:['Python'], icon:'💻'},
+  ],
+  posts:[
+    {title:'أول مقال في مدونتي', body:'عدّل هذا المقال من لوحة التحكم، أو أضف مقالات جديدة.', date:'6 أكتوبر 2026'},
+  ]
+};
+
+function getData(){
+  // الأول: نقرأ من ملف data.js (الملف الرسمي)
+  if(typeof siteData !== 'undefined'){
+    return {...fallbackData, ...siteData};
+  }
+
+  // الثاني: نقرأ من localStorage (للمعاينة السريعة)
+  try{
+    const raw = localStorage.getItem('siteData');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      return {...fallbackData, ...parsed};
+    }
+  }catch(e){}
+
+  // الأخير: البيانات الاحتياطية
+  return fallbackData;
+}
+
+function esc(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ====== تطبيق الثيم ======
+function applyTheme(d){
+  const root = document.documentElement;
+  root.style.setProperty('--primary', d.colorPrimary || '#22d3ee');
+  root.style.setProperty('--accent', d.colorAccent || '#3b82f6');
+  root.style.setProperty('--bg', d.colorBg || '#0b1220');
+  root.style.setProperty('--card', d.colorCard || '#1e293b');
+  root.style.setProperty('--text', d.colorText || '#e2e8f0');
+  root.style.setProperty('--muted', d.themeMode === 'light' ? '#64748b' : '#94a3b8');
+  root.style.setProperty('--border', d.themeMode === 'light' ? '#e2e8f0' : '#334155');
+  document.body.classList.toggle('light', d.themeMode === 'light');
+}
+
+// ====== تأثير الكتابة المتحركة ======
+let typeTimer;
+function typeEffect(text){
+  clearInterval(typeTimer);
+  const el = document.getElementById('typedTagline');
+  el.textContent = '';
+  let i = 0;
+  typeTimer = setInterval(() => {
+    if(i < text.length){
+      el.textContent += text[i];
+      i++;
+    } else {
+      clearInterval(typeTimer);
+    }
+  }, 60);
+}
+
+// ====== عداد الأرقام ======
+function animateNumber(el, target){
+  let current = 0;
+  const step = Math.max(1, Math.floor(target / 30));
+  const timer = setInterval(() => {
+    current += step;
+    if(current >= target){
+      el.textContent = target;
+      clearInterval(timer);
+    } else {
+      el.textContent = current;
+    }
+  }, 40);
+}
+
+// ====== تأثيرات الظهور ======
+function setupReveal(){
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {threshold: 0.1});
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+// ====== رندر البرامج ======
+function renderPrograms(list){
+  return list.map(p=>`
+    <div class="prog-card">
+      <div class="icon">${esc(p.icon || '💻')}</div>
+      <h3>${esc(p.name)}</h3>
+      <p>${esc(p.desc || '')}</p>
+      <div class="tags">${(p.tags || []).map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+      ${p.link ? `<a class="btn" href="${esc(p.link)}" target="_blank">تحميل / تجربة</a>` : ''}
+    </div>`).join('') || '<p style="color:var(--muted);text-align:center;padding:40px;">لا يوجد برامج بعد</p>';
+}
+
+// ====== رندر المقالات ======
+function renderPosts(list){
+  return list.map(p=>`
+    <div class="card">
+      <div class="post-meta">${esc(p.date || '')}</div>
+      <h3 style="margin-bottom:10px;font-size:1.2rem;">${esc(p.title)}</h3>
+      <p>${esc(p.body || '')}</p>
+    </div>`).join('') || '<p style="color:var(--muted);text-align:center;padding:40px;">لا يوجد مقالات بعد</p>';
+}
+
+// ====== رندر الموقع ======
+function renderSite(){
+  const d = getData();
+  applyTheme(d);
+
+  document.title = d.siteTitle || 'موقعي الشخصي';
+  document.getElementById('avatar').textContent = (d.ownerName || 'م').trim().charAt(0) || 'م';
+  document.getElementById('ownerName').textContent = d.ownerName || '';
+  document.getElementById('aboutText').textContent = d.aboutText || '';
+  document.getElementById('footerText').textContent = d.footerText || '';
+
+  // الكتابة المتحركة
+  typeEffect(d.tagline || '');
+
+  // الروابط الاجتماعية
+  const socials = (d.socials || []).filter(s => s && String(s).trim());
+  document.getElementById('socials').innerHTML = socials.map(s => {
+    const label = String(s).replace(/^https?:\/\//,'').split('/')[0];
+    return `<a href="${esc(s)}" target="_blank">${esc(label)}</a>`;
+  }).join('');
+
+  // البرامج والمقالات
+  const programs = d.programs || [];
+  const posts = d.posts || [];
+  const programsHtml = renderPrograms(programs);
+  const postsHtml = renderPosts(posts);
+
+  document.getElementById('homePrograms').innerHTML = programsHtml;
+  document.getElementById('allPrograms').innerHTML = programsHtml;
+  document.getElementById('homePosts').innerHTML = postsHtml;
+  document.getElementById('allPosts').innerHTML = postsHtml;
+
+  // الإحصائيات
+  const allTags = programs.flatMap(p => p.tags || []);
+  const uniqueTags = [...new Set(allTags)];
+
+  animateNumber(document.getElementById('statPrograms'), programs.length);
+  animateNumber(document.getElementById('statPosts'), posts.length);
+  animateNumber(document.getElementById('statTags'), uniqueTags.length);
+
+  setupReveal();
+}
+
+// ====== القائمة ======
+function toggleMenu(){
+  document.getElementById('menuPanel').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+
+function showSection(id,btn){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  document.querySelectorAll('#menuPanel button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('menuPanel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // إعادة تفعيل تأثيرات الظهور
+  setTimeout(setupReveal, 100);
+}
+
+// ====== زر العودة للأعلى ======
+window.addEventListener('scroll', () => {
+  const toTop = document.getElementById('toTop');
+  if(window.scrollY > 300){
+    toTop.classList.add('show');
+  } else {
+    toTop.classList.remove('show');
+  }
+});
+
+// ====== تحديث تلقائي ======
+window.addEventListener('storage', renderSite);
+
+// ====== التشغيل ======
+renderSite();
+</script>
+</body>
+</html>
